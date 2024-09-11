@@ -1,12 +1,14 @@
-self.onmessage = function(e) {
-  // Perform heavy computation here
-  const result = heavyComputation(e.data)
-  self.postMessage(result)
+function heavyComputation(data: any): any {
+  // Implement your heavy computation logic here
+  // This is just a placeholder example
+  return data * 2;
 }
 
-// In your component:
-const worker = new Worker(new URL('../workers/heavyComputation.worker.ts', import.meta.url))
-worker.onmessage = function(e) {
-  // Handle the result
+self.onmessage = function(e) {
+  // Perform heavy computation here
+  const result = heavyComputation(e.data);
+  self.postMessage(result);
 }
-worker.postMessage(dataForComputation)
+
+// Ensure the worker script is treated as a module
+export {};

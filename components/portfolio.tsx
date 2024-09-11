@@ -12,7 +12,17 @@ import { motion, useScroll, useTransform, Variants } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { useDarkMode } from '@/hooks/useDarkMode'
 import dynamic from 'next/dynamic'
-import { debounce } from 'lodash'
+
+// Add this custom debounce function
+function debounce<F extends (...args: unknown[]) => void>(func: F, wait: number): (...args: Parameters<F>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<F>) => {
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
 
 interface AnimatedSectionProps {
   children: React.ReactNode;
@@ -78,6 +88,11 @@ const staggerChildren: Variants = {
   },
 }
 
+// Add this near the top of your file, outside of any component
+const worker = typeof Worker !== 'undefined' 
+  ? new Worker(new URL('../workers/heavyComputation.worker.ts', import.meta.url))
+  : null;
+
 export const Portfolio = () => {
   const [darkMode, setDarkMode] = useDarkMode()
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
@@ -115,7 +130,24 @@ export const Portfolio = () => {
   useEffect(() => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [handleScroll])
+
+  useEffect(() => {
+    if (worker) {
+      worker.onmessage = function(e) {
+        console.log('Result from worker:', e.data);
+        // Handle the result here
+      };
+    }
+  }, []);
+
+  const performHeavyComputation = (data: unknown) => {
+    if (worker) {
+      worker.postMessage(data);
+    } else {
+      console.warn('Web Workers are not supported in this environment');
+    }
+  };
 
   const SkillCards = useMemo(() => (
     <motion.div 
@@ -199,7 +231,7 @@ export const Portfolio = () => {
             <main className="container mx-auto px-4 py-8">
               {/* Hero Section */}
               <AnimatedSection>
-                <section className="py-12 md:py-24 lg:py-32 xl:py-48 flex items-center justify-center">
+                <section className="py-8 md:py-16 lg:py-24 xl:py-32 flex items-center justify-center">
                   <div className="text-center">
                     <motion.h1
                       initial={{ opacity: 0, scale: 0.5 }}

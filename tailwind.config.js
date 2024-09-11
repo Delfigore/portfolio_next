@@ -17,6 +17,5 @@ module.exports = {
       // Add any other custom theme extensions here
     },
   },
-  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   plugins: [],
 }
