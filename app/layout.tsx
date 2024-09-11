@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter, Roboto_Mono } from 'next/font/google';
 import "./globals.css";
+import Script from 'next/script';
 import Head from 'next/head';
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const inter = Inter({
+  subsets: ['latin'],
   display: 'swap',
+  variable: '--font-inter',
 });
 
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
   display: 'swap',
+  variable: '--font-roboto-mono',
 });
 
 export const metadata: Metadata = {
@@ -30,13 +29,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Head>
-        <link rel="preload" href="/fonts/GeistVF.woff" as="font" type="font/woff" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/GeistMonoVF.woff" as="font" type="font/woff" crossOrigin="anonymous" />
-      </Head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} ${robotoMono.variable} antialiased`}>
+        <Head>
+          <link
+            rel="preload"
+            href="/fonts/your-critical-font.woff2"
+            as="font"
+            type="font/woff2"
+            crossOrigin="anonymous"
+          />
+        </Head>
+        <Script src="https://example.com/analytics.js" strategy="lazyOnload" />
         {children}
       </body>
     </html>
