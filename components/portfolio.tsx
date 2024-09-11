@@ -1,17 +1,14 @@
 'use client'
 
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Code, Github, Linkedin, Mail, Moon, Sun, Zap } from "lucide-react"
 import Link from "next/link"
 import { motion, useScroll, useTransform, Variants } from "framer-motion"
 import { useInView } from "react-intersection-observer"
-import { useState, useEffect, useRef } from "react"
-import Particles from "react-particles"
-import { loadFull } from "tsparticles"
-import Image from 'next/image'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import dynamic from 'next/dynamic'
 import { lazy, Suspense } from 'react'
@@ -80,7 +77,6 @@ const staggerChildren: Variants = {
 export const Portfolio = () => {
   const [darkMode, setDarkMode] = useDarkMode()
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
 
   // Add refs for each section
   const aboutRef = useRef<HTMLElement>(null)
@@ -105,8 +101,6 @@ export const Portfolio = () => {
     e.preventDefault()
     // Implement form validation and submission logic here
   }
-
-  const contactEmail = process.env.NEXT_PUBLIC_EMAIL
 
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
@@ -263,18 +257,15 @@ export const Portfolio = () => {
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-gray-700 dark:text-gray-300">Name</label>
                     <Input id="name" name="name" value={formData.name} onChange={handleInputChange} placeholder="Your name" className="bg-white/50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 focus:border-purple-600 dark:focus:border-purple-400" />
-                    {formErrors.name && <p className="text-red-500">{formErrors.name}</p>}
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</label>
                     <Input id="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Your email" type="email" className="bg-white/50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 focus:border-purple-600 dark:focus:border-purple-400" />
-                    {formErrors.email && <p className="text-red-500">{formErrors.email}</p>}
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="message" className="text-gray-700 dark:text-gray-300">Message</label>
                   <Textarea id="message" name="message" value={formData.message} onChange={handleInputChange} placeholder="Your message" className="bg-white/50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 focus:border-purple-600 dark:focus:border-purple-400" />
-                  {formErrors.message && <p className="text-red-500">{formErrors.message}</p>}
                 </div>
                 <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">Send Message</Button>
               </form>

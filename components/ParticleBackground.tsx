@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import Particles from "react-particles";
-import type { Engine } from "tsparticles-engine";
+import type { Engine, ISourceOptions, MoveDirection } from "tsparticles-engine";
 import { loadSlim } from "tsparticles-slim";
 
 export const ParticleBackground: React.FC = () => {
@@ -8,7 +8,7 @@ export const ParticleBackground: React.FC = () => {
     await loadSlim(engine);
   }, []);
 
-  const options = useMemo(() => ({
+  const options: ISourceOptions = {
     background: {
       color: {
         value: "transparent",
@@ -49,7 +49,7 @@ export const ParticleBackground: React.FC = () => {
         width: 1,
       },
       move: {
-        direction: "none",
+        direction: "none" as MoveDirection,
         enable: true,
         outModes: {
           default: "bounce",
@@ -76,7 +76,7 @@ export const ParticleBackground: React.FC = () => {
       },
     },
     detectRetina: true,
-  }), []);
+  };
 
   return (
     <Particles
