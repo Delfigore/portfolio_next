@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Code, Github, Linkedin, Mail, Moon, Sun, Zap } from "lucide-react"
+import { Code, Github, Linkedin, Mail, Moon, Sun, Zap, Menu } from "lucide-react"
 import Link from "next/link"
 import Image from 'next/image'
 import { motion, useScroll, useTransform, Variants } from "framer-motion"
@@ -29,7 +29,7 @@ interface AnimatedSectionProps {
 }
 
 const AnimatedSection: React.FC<AnimatedSectionProps> = ({ children }) => {
-  const [ref, inView] = useInView({
+  const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1,
     rootMargin: '0px 0px 50px 0px',
@@ -96,6 +96,7 @@ const worker = typeof Worker !== 'undefined'
 export const Portfolio = () => {
   const [darkMode, setDarkMode] = useDarkMode()
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Add refs for each section
   const aboutRef = useRef<HTMLElement>(null)
@@ -151,28 +152,32 @@ export const Portfolio = () => {
 
   const SkillCards = useMemo(() => (
     <motion.div 
-      className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+      className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4"
       variants={staggerChildren}
       initial="hidden"
       animate="visible"
     >
       {["JavaScript", "React", "Node.js", "Python", "SQL", "Git", "AWS", "Docker", "TypeScript", "GraphQL"].map((skill) => (
         <motion.div key={skill} variants={fadeIn}>
-          <Card className="flex flex-col items-center justify-center p-4 bg-white/30 dark:bg-gray-800/30 backdrop-blur-md hover:bg-white/40 dark:hover:bg-gray-700/40 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-gray-200/50 dark:border-gray-700/50">
-            <Code className="h-8 w-8 mb-2 text-purple-600 dark:text-purple-400" />
-            <p className="text-sm font-medium">{skill}</p>
+          <Card className="flex flex-col items-center justify-center p-2 sm:p-4 bg-white/30 dark:bg-gray-800/30 backdrop-blur-md hover:bg-white/40 dark:hover:bg-gray-700/40 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-gray-200/50 dark:border-gray-700/50">
+            <Code className="h-6 w-6 sm:h-8 sm:w-8 mb-1 sm:mb-2 text-purple-600 dark:text-purple-400" />
+            <p className="text-xs sm:text-sm font-medium">{skill}</p>
           </Card>
         </motion.div>
       ))}
     </motion.div>
   ), [])
 
+  const LazyProjectsSection = dynamic(() => import('@/components/ProjectsSection'), {
+    loading: () => <p>Loading projects...</p>
+  })
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
       {darkMode !== null && (
         <>
           <GradientBackground />
-          <div className="relative min-h-screen bg-white/10 dark:bg-gray-950/90 text-gray-800 dark:text-gray-100 transition-colors duration-300 backdrop-blur-sm">
+          <div className="relative min-h-screen flex flex-col bg-white/10 dark:bg-gray-950/90 text-gray-800 dark:text-gray-100 transition-colors duration-300 backdrop-blur-sm">
             {/* Header */}
             <motion.header
               initial={{ y: -100 }}
@@ -180,64 +185,135 @@ export const Portfolio = () => {
               transition={{ type: "spring", stiffness: 100, damping: 20 }}
               className="sticky top-0 z-40 w-full border-b border-gray-200/20 dark:border-gray-700/20 bg-white/10 dark:bg-gray-900/10 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 dark:supports-[backdrop-filter]:bg-gray-900/5"
             >
-              <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                <div className="flex gap-6 md:gap-10">
+              <div className="container mx-auto px-4 py-2 sm:py-4">
+                <div className="flex items-center justify-between">
                   <Link className="flex items-center space-x-2" href="/">
                     <Zap className="text-purple-600 dark:text-purple-400" />
-                    <span className="inline-block font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400">delfigore.dev</span>
+                    <span className="text-sm sm:text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400">delfigore.dev</span>
                   </Link>
+                  <button
+                    className="lg:hidden p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  >
+                    <Menu className="h-6 w-6" />
+                  </button>
+                  <nav className={`hidden lg:flex items-center space-x-4`}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => scrollToSection(aboutRef)}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      About
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => scrollToSection(skillsRef)}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      Skills
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => scrollToSection(projectsRef)}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      Projects
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => scrollToSection(contactRef)}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      Contact
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={toggleDarkMode}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                      <span className="sr-only">{darkMode ? 'Light mode' : 'Dark mode'}</span>
+                    </Button>
+                  </nav>
                 </div>
-                <nav className="flex items-center space-x-1">
-                  <Button
-                    variant="ghost"
-                    onClick={() => scrollToSection(aboutRef)}
-                    className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
-                  >
-                    About
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => scrollToSection(skillsRef)}
-                    className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
-                  >
-                    Skills
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => scrollToSection(projectsRef)}
-                    className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
-                  >
-                    Projects
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => scrollToSection(contactRef)}
-                    className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
-                  >
-                    Contact
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={toggleDarkMode}
-                    className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
-                  >
-                    {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                    <span className="sr-only">{darkMode ? 'Light mode' : 'Dark mode'}</span>
-                  </Button>
+                {/* Mobile menu */}
+                <nav className={`${isMenuOpen ? 'block' : 'hidden'} lg:hidden mt-4`}>
+                  <div className="flex flex-col space-y-2">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        scrollToSection(aboutRef)
+                        setIsMenuOpen(false)
+                      }}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      About
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        scrollToSection(skillsRef)
+                        setIsMenuOpen(false)
+                      }}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      Skills
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        scrollToSection(projectsRef)
+                        setIsMenuOpen(false)
+                      }}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      Projects
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        scrollToSection(contactRef)
+                        setIsMenuOpen(false)
+                      }}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      Contact
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        toggleDarkMode()
+                        setIsMenuOpen(false)
+                      }}
+                      className="text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200"
+                    >
+                      {darkMode ? (
+                        <>
+                          <Sun className="h-5 w-5 mr-2" />
+                          Light Mode
+                        </>
+                      ) : (
+                        <>
+                          <Moon className="h-5 w-5 mr-2" />
+                          Dark Mode
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </nav>
               </div>
             </motion.header>
 
-            <main className="container mx-auto px-4 py-8">
+            <main className="flex-grow container mx-auto px-4 py-8 flex flex-col">
               {/* Hero Section */}
               <AnimatedSection>
-                <section className="py-8 md:py-16 lg:py-24 xl:py-32 flex items-center justify-center">
-                  <div className="text-center">
+                <section className="py-4 sm:py-8 md:py-16 lg:py-24 xl:py-32 flex items-center justify-center min-h-[calc(100vh-4rem)]">
+                  <div className="text-center px-4 sm:px-6 md:px-8">
                     <motion.h1
                       initial={{ opacity: 0, scale: 0.5 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5 }}
-                      className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400"
+                      className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400"
                     >
                       Welcome to{" "}
                       <motion.span
@@ -253,7 +329,7 @@ export const Portfolio = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2, duration: 0.5 }}
-                      className="mt-4 mx-auto max-w-[700px] text-gray-600 dark:text-gray-400 md:text-xl"
+                      className="mt-2 sm:mt-4 mx-auto max-w-[700px] text-gray-600 dark:text-gray-400 text-sm sm:text-base md:text-lg lg:text-xl"
                     >
                       Crafting elegant solutions through code. Full-stack developer passionate about creating impactful web experiences.
                     </motion.p>
@@ -261,15 +337,18 @@ export const Portfolio = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4, duration: 0.5 }}
-                      className="mt-8 space-x-4"
+                      className="mt-4 sm:mt-8 flex flex-col sm:flex-row justify-center items-center gap-4"
                     >
-                      <Link href="/projects" className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 rounded-md">
+                      <Button
+                        onClick={() => scrollToSection(projectsRef)}
+                        className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 rounded-md text-sm sm:text-base"
+                      >
                         View Projects
-                      </Link>
+                      </Button>
                       <Button
                         variant="outline"
                         onClick={() => scrollToSection(contactRef)}
-                        className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-400 dark:hover:text-gray-900 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                        className="w-full sm:w-auto border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-400 dark:hover:text-gray-900 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm sm:text-base"
                       >
                         Contact Me
                       </Button>
@@ -281,8 +360,8 @@ export const Portfolio = () => {
               {/* About Me Section */}
               <AnimatedSection>
                 <section ref={aboutRef} className="py-12 md:py-24 lg:py-32 flex flex-col items-center">
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">About Me</h2>
-                  <p className="mt-4 max-w-[700px] text-gray-600 dark:text-gray-400 text-center backdrop-blur-md bg-white/30 dark:bg-gray-800/30 p-6 rounded-lg shadow-lg">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">About Me</h2>
+                  <p className="mt-4 max-w-[700px] text-gray-600 dark:text-gray-400 text-center backdrop-blur-md bg-white/30 dark:bg-gray-800/30 p-6 rounded-lg shadow-lg text-sm sm:text-base">
                     I'm a passionate full-stack developer with a keen eye for design and a love for clean, efficient code. With years of experience in web development, I specialize in creating responsive and user-friendly applications that solve real-world problems.
                   </p>
                 </section>
@@ -291,7 +370,7 @@ export const Portfolio = () => {
               {/* Skills Section */}
               <AnimatedSection>
                 <section ref={skillsRef} className="py-12 md:py-24 lg:py-32 flex flex-col items-center">
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">Skills & Technologies</h2>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">Skills & Technologies</h2>
                   {SkillCards}
                 </section>
               </AnimatedSection>
@@ -299,63 +378,35 @@ export const Portfolio = () => {
               {/* Projects Section */}
               <AnimatedSection>
                 <section ref={projectsRef} className="py-12 md:py-24 lg:py-32 flex flex-col items-center">
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">Featured Projects</h2>
-                  <motion.div 
-                    className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                    variants={staggerChildren}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {[
-                      { title: "Project 1", description: "A brief description of Project 1" },
-                      { title: "Project 2", description: "A brief description of Project 2" },
-                      { title: "Project 3", description: "A brief description of Project 3" },
-                    ].map((project, index) => (
-                      <motion.div key={index} variants={fadeIn}>
-                        <Card className="bg-white/30 dark:bg-gray-800/30 backdrop-blur-md hover:bg-white/40 dark:hover:bg-gray-700/40 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 border border-gray-200/50 dark:border-gray-700/50">
-                          <CardHeader>
-                            <CardTitle className="text-purple-600 dark:text-purple-400 text-center">{project.title}</CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                            <p className="text-gray-600 dark:text-gray-400 text-center">{project.description}</p>
-                          </CardContent>
-                          <CardFooter className="flex justify-center">
-                            <Button
-                              variant="outline"
-                              className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white dark:border-purple-400 dark:text-purple-400 dark:hover:bg-purple-400 dark:hover:text-gray-900 transition-all duration-200 transform hover:-translate-y-1"
-                            >
-                              View Project
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      </motion.div>
-                    ))}
-                  </motion.div>
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">Featured Projects</h2>
+                  <Suspense fallback={<div>Loading projects...</div>}>
+                    <LazyProjectsSection />
+                  </Suspense>
                 </section>
               </AnimatedSection>
 
               {/* Contact Form */}
               <AnimatedSection>
-                <section ref={contactRef} className="py-12 md:py-24 lg:py-32 flex flex-col items-center">
-                  <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">Get in Touch</h2>
-                  <form onSubmit={handleSubmit} className="mt-8 space-y-4 w-full max-w-md bg-white/30 dark:bg-gray-800/30 backdrop-blur-md p-6 rounded-lg shadow-lg">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <label htmlFor="name" className="text-gray-700 dark:text-gray-300">Name</label>
+                <section ref={contactRef} className="py-8 sm:py-12 md:py-24 lg:py-32 flex flex-col items-center">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 dark:from-purple-400 dark:via-pink-400 dark:to-blue-400 text-center">Get in Touch</h2>
+                  <form onSubmit={handleSubmit} className="mt-4 sm:mt-8 space-y-4 w-full max-w-md bg-white/30 dark:bg-gray-800/30 backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-lg">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1 space-y-2">
+                        <label htmlFor="name" className="text-sm text-gray-700 dark:text-gray-300">Name</label>
                         <Input id="name" name="name" value={formData.name} onChange={handleInputChange} placeholder="Your name" className="bg-white/50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 focus:border-purple-600 dark:focus:border-purple-400" />
                       </div>
-                      <div className="space-y-2">
-                        <label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</label>
+                      <div className="flex-1 space-y-2">
+                        <label htmlFor="email" className="text-sm text-gray-700 dark:text-gray-300">Email</label>
                         <Input id="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Your email" type="email" className="bg-white/50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 focus:border-purple-600 dark:focus:border-purple-400" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="message" className="text-gray-700 dark:text-gray-300">Message</label>
+                      <label htmlFor="message" className="text-sm text-gray-700 dark:text-gray-300">Message</label>
                       <Textarea id="message" name="message" value={formData.message} onChange={handleInputChange} placeholder="Your message" className="bg-white/50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600 focus:border-purple-600 dark:focus:border-purple-400" />
                     </div>
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-sm sm:text-base"
                     >
                       Send Message
                     </Button>
@@ -366,8 +417,8 @@ export const Portfolio = () => {
 
             {/* Footer */}
             <footer className="border-t border-gray-200/20 dark:border-gray-700/20 bg-white/10 dark:bg-gray-900/10 backdrop-blur-md">
-              <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-between gap-4 md:flex-row">
-                <p className="text-center text-sm leading-loose text-gray-600 dark:text-gray-400">
+              <div className="container mx-auto px-4 py-6 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p className="text-center text-xs sm:text-sm leading-loose text-gray-600 dark:text-gray-400">
                   © 2024 delfigore.dev. All rights reserved.
                 </p>
                 <div className="flex gap-4">
