@@ -280,7 +280,7 @@ export const Portfolio = () => {
               © 2024 delfigore.dev. All rights reserved.
             </p>
             <div className="flex gap-4">
-              <Link href="#" className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200">
+              <Link href="https://github.com/Delfigore" target="_blank" rel="noopener noreferrer" className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200">
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </Link>
